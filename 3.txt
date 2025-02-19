@@ -1,0 +1,52 @@
+import heapq
+
+def print_state(state):
+    for row in state:
+        print(' '.join(map(str,row)))
+    print()
+
+def move(state,i,j,ni,nj):
+    if 0<=ni<3 and 0<=nj<3:
+        state[i][j],state[ni][nj]=state[ni][nj],state[i][j]
+        return state
+
+def manhattan(s,goal):
+    dist=0
+    for i in range(3):
+        for j in range (3):
+            if s[i][j]!=0:
+                x,y=[(x,y) for x in range (3) for y in range (3) if goal[x][y]==s[i][j]][0]
+                dist+=abs(i-x)+abs(j-y)
+    return dist
+
+def a_star(init, goal):
+    def h(s):
+        return manhattan(s,goal)
+    OPEN,CLOSED=[],set()
+    heapq.heappush(OPEN,(h(init),0,init))
+    moves=0
+
+    while OPEN:
+        f,g,state=heapq.heappop(OPEN)
+        CLOSED.add(tuple(map(tuple,state)))
+        print_state(state)
+        moves+=1
+
+
+        if state==goal:
+            print("Solution!")
+            print(f"No of moves: {g}")
+            return
+        
+        i,j=[(i,j) for i in range (3) for j in range (3) if state[i][j]==0][0]
+
+        for di,dj in [(0,-1),(0,1),(1,0),(-1,0)]:
+            new_state = move([row[:] for row in state], i, j, i + di, j + dj)
+            if new_state and tuple(map(tuple,new_state)) not in CLOSED:
+                heapq.heappush(OPEN,((g+1+h(new_state)),g+1,new_state))
+
+    print("No solution!")
+
+a_star([[2, 8, 1], [0, 4, 3], [7, 6, 5]], [[1, 2, 3], [8, 0, 4], [7, 6, 5]])
+
+

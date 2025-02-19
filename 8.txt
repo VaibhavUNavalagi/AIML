@@ -1,0 +1,23 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+X = load_iris().data
+
+centers = X[np.random.choice(len(X), 3)]
+groups = np.zeros(len(X))
+
+for _ in range(100):
+    for i in range(len(X)):
+        distances = [np.sum((X[i] - c)**2) for c in centers]
+        groups[i] = distances.index(min(distances))
+    for i in range(3):
+        points = X[groups == i]
+        centers[i] = np.mean(points, axis=0)
+
+for i in range(3):
+    plt.scatter(X[(groups == i), 0], X[(groups == i), 1])
+plt.scatter(centers[:, 0], centers[:, 1], marker ='x', color='black', s=50)
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.title("K-means Clustering on Iris Dataset")
+plt.show()

@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import datasets
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix,classification_report
+from collections import Counter
+
+iris=datasets.load_iris()
+x=iris.data
+y=iris.target
+class_names = load_iris().target_names
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.4,random_state=42)
+
+class KNN:
+    def __init__(self,k=3):
+        self.k=k
+    def fit(self,x,y):
+        self.x_train=x
+        self.y_train=y
+    def predictOne(self,x):
+        distances=[np.linalg.norm(x-trainInst) for trainInst in self.x_train]
+        k_indices=(np.argsort(distances))[:self.k]
+        k_labels=[self.y_train[i] for i in k_indices]
+        self.ctr=Counter(k_labels)
+        return self.ctr.most_common(1)[0][0]
+    def predict(self,x):
+        return [self.predictOne(xInst) for xInst in x]
+
+knn=KNN(k=3)
+knn.fit(x_train,y_train)
+
+y_pred=knn.predict(x_test)
+np.mean(y_pred==y_test)
+print(np.mean(y_pred==y_test))
+
+cm=confusion_matrix(y_test,y_pred)
+cr=classification_report(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(cm)
+print("Predictions:", class_names[y_pred])
+print("\nClassification Report:")
+print(cr)
+for i in range(len(cm)):
+    for j in range(len(cm[i])):
+        plt.text(j, i, cm[i, j], ha="center", va="center", color="black") 
+plt.imshow(cm, interpolation='nearest', cmap='magma')  
+plt.colorbar()  
+plt.grid(False)  
+plt.title("KNN-(k=3)")
+plt.xlabel("Classes")
+plt.ylabel("Classes")
+plt.show()
